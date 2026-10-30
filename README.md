@@ -54,16 +54,23 @@ mvn spring-boot:run      # levanta en http://localhost:8080
 mvn test                 # pruebas del LoggingProxy
 ```
 
-## Despliegue en Railway
+## Despliegue en Render
 
 1. Sube este proyecto a su propio repositorio de GitHub.
-2. En Railway: **New Project → Deploy from GitHub repo** y selecciona el repo.
-   Railway detecta el `Dockerfile` y construye la imagen (Java 21).
-3. En **Settings → Networking → Generate Domain** para obtener la URL pública.
-4. En **Variables** agrega:
+2. En [render.com](https://render.com) inicia sesión con GitHub → **New → Web Service** → selecciona el repo.
+3. Configuración:
+   - **Language / Runtime:** `Docker` (Render detecta el `Dockerfile`).
+   - **Instance Type:** `Free`.
+   - **Health Check Path** (en Advanced): `/api/metrics/summary`.
+4. En **Environment Variables** agrega:
    - `CORS_ALLOWED_ORIGINS` = URL del frontend en Vercel (ej. `https://proxy-monitor.vercel.app`).
-     Puedes poner varias separadas por coma. Si no la defines, se permite cualquier origen (`*`).
+     Si aún no la tienes, déjala en `*` y cámbiala después.
    - (Opcional) `PAYMENTS_FAILURE_RATE` = `0.10`.
-5. `PORT` lo inyecta Railway automáticamente.
+5. **Create Web Service**. La URL queda como `https://proxy-monitor-backend.onrender.com`.
+   `PORT` lo inyecta Render automáticamente.
 
-> Nota: los logs se guardan en memoria (máx. 10.000). Se reinician cuando el servicio se redepliega o se reinicia.
+Alternativa: **New → Blueprint** y seleccionar el repo; Render lee el `render.yaml` incluido.
+
+> Notas del plan gratuito: el servicio se "duerme" tras ~15 min sin tráfico y la primera petición
+> tarda ~1 minuto en despertarlo. Los logs están en memoria, así que se pierden cuando se duerme o redepliega
+> (basta con pulsar "Simular carga" de nuevo).
