@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: proxy-monitor-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/metrics/summary
+    envVars:
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
